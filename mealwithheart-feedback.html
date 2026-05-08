@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meal With Heart — Donor Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:        #C0392B;
+    --red-dark:   #922B21;
+    --red-light:  #FDECEA;
+    --red-mid:    #E85D50;
+    --green:      #2E7D4F;
+    --green-dark: #1B5E35;
+    --green-light:#EAF5EE;
+    --green-mid:  #52A872;
+    --gold:       #D4A017;
+    --bg:         #FDFAF7;
+    --white:      #ffffff;
+    --text:       #1C1208;
+    --muted:      #7A6B5A;
+    --border:     #E8DDD3;
+    --star-on:    #C0392B;
+    --star-off:   #E8C9C6;
+    --radius:     14px;
+    --radius-sm:  9px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 44px 24px 72px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 99px;
+    padding: 4px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #C3E0CE;
+  }
+  .header-left h1 {
+    font-family: 'Lora', serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--red-dark);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .header-left p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 500px;
+    line-height: 1.65;
+  }
+  .header-score { text-align: center; flex-shrink: 0; }
+  .score-num {
+    font-family: 'Lora', serif;
+    font-size: 54px;
+    font-weight: 600;
+    color: var(--red);
+    line-height: 1;
+  }
+  .score-stars { font-size: 21px; color: var(--star-on); letter-spacing: 3px; margin: 5px 0 3px; }
+  .score-count { font-size: 13px; color: var(--muted); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── RATING BARS ── */
+  .rating-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 28px;
+    margin-bottom: 28px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 9px;
+  }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-stars { font-size: 14px; color: var(--star-on); min-width: 86px; }
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--red-light);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red-mid), var(--red));
+    border-radius: 99px;
+    transition: width 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-pct { font-size: 13px; color: var(--muted); min-width: 36px; text-align: right; }
+
+  /* ── FORM ── */
+  .form-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--green));
+  }
+  .form-card h2 {
+    font-family: 'Lora', serif;
+    font-size: 21px;
+    color: var(--red-dark);
+    margin-bottom: 5px;
+  }
+  .form-card .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 22px;
+    line-height: 1.6;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--green-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+    appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--red);
+    background: var(--white);
+  }
+  .form-group textarea { resize: vertical; min-height: 96px; }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C0392B' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+  }
+
+  /* Star rating input */
+  .star-input { display: flex; gap: 4px; padding-top: 4px; }
+  .star-input span {
+    font-size: 30px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    user-select: none;
+    line-height: 1;
+  }
+  .star-input span:hover { transform: scale(1.2); }
+  .son { color: var(--star-on); }
+  .soff { color: var(--star-off); }
+
+  /* Photo upload */
+  .photo-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--bg);
+  }
+  .photo-zone:hover { border-color: var(--green-mid); background: var(--green-light); }
+  .photo-zone p { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  #photoInput { display: none; }
+  #photoPreview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  #photoPreview img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1.5px solid var(--border); cursor: pointer; }
+
+  /* Buttons */
+  .btn-row { display: flex; align-items: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-submit {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn-submit:hover { background: var(--red-dark); transform: translateY(-1px); }
+  .btn-submit:active { transform: scale(0.97); }
+  .btn-clear {
+    background: none;
+    color: var(--green-dark);
+    border: 1.5px solid var(--border);
+    border-radius: 99px;
+    padding: 11px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-clear:hover { border-color: var(--green); background: var(--green-light); }
+  .btn-note {
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 280px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green-dark);
+    color: white;
+    padding: 12px 26px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.35s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    align-items: center;
+  }
+  .filter-btn {
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--text);
+    border-radius: 99px;
+    padding: 7px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active { background: var(--red); color: white; border-color: var(--red); }
+  .filter-btn:hover:not(.active) { border-color: var(--red-mid); color: var(--red); }
+  .filter-select {
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--text);
+    border-radius: 99px;
+    padding: 7px 34px 7px 16px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C0392B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  /* ── REVIEW CARDS ── */
+  #reviewList { display: flex; flex-direction: column; gap: 16px; }
+  .review-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .reviewer-info { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--red-light);
+    color: var(--red);
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1.5px solid #F5C0BC;
+  }
+  .reviewer-name { font-size: 15px; font-weight: 500; color: var(--text); }
+  .reviewer-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .review-like {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--red-light);
+    border: none;
+    border-radius: 99px;
+    padding: 5px 13px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--red);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .review-like:hover { background: #F5C0BC; }
+  .review-like.liked { background: var(--red); color: white; }
+
+  .review-stars { font-size: 16px; color: var(--star-on); margin-bottom: 7px; letter-spacing: 1px; }
+  .review-program {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #C3E0CE;
+  }
+  .review-text {
+    font-size: 14px;
+    line-height: 1.72;
+    color: #3A2B1E;
+    margin-bottom: 12px;
+  }
+  .review-photos { display: flex; flex-wrap: wrap; gap: 8px; }
+  .review-photos img {
+    width: 80px; height: 80px;
+    object-fit: cover;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .review-photos img:hover { transform: scale(1.05); }
+
+  .no-reviews {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  /* Impact ribbon */
+  .impact-ribbon {
+    background: linear-gradient(135deg, var(--red-dark) 0%, var(--green-dark) 100%);
+    border-radius: var(--radius);
+    padding: 20px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .impact-ribbon p {
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    font-style: italic;
+    flex: 1;
+    min-width: 200px;
+    line-height: 1.6;
+  }
+  .impact-stat {
+    text-align: center;
+    color: white;
+    min-width: 80px;
+  }
+  .impact-stat .num {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1;
+    display: block;
+  }
+  .impact-stat .lbl { font-size: 11px; opacity: 0.8; margin-top: 3px; }
+
+  /* Lightbox */
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,5,0,0.88);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  #lightbox.open { display: flex; }
+  #lightbox img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 10px;
+  }
+  #lightbox-close {
+    position: absolute;
+    top: 20px; right: 24px;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    opacity: 0.8;
+    line-height: 1;
+  }
+  #lightbox-close:hover { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .header { flex-direction: column; }
+    .form-row { grid-template-columns: 1fr; }
+    .header-left h1 { font-size: 24px; }
+    .score-num { font-size: 42px; }
+    .impact-ribbon { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-badge">❤ From Those We Serve & Those Who Give</div>
+      <h1>Voices of Our Community</h1>
+      <p>Real stories from donors, volunteers, and meal recipients. Your words inspire others to join us in turning small acts of kindness into meaningful, visible impact across Ho Chi Minh City.</p>
+    </div>
+    <div class="header-score">
+      <div class="score-num" id="avgScore">4.9</div>
+      <div class="score-stars" id="avgStars">★★★★★</div>
+      <div class="score-count" id="totalCount">28 stories</div>
+    </div>
+  </div>
+
+  <!-- IMPACT RIBBON -->
+  <div class="impact-ribbon">
+    <p><em>"Every meal donated is a story of hope. Read what donors and recipients have experienced — and share yours."</em></p>
+    <div class="impact-stat"><span class="num" id="statMeals">1,240</span><div class="lbl">meals delivered</div></div>
+    <div class="impact-stat"><span class="num" id="statDonors">312</span><div class="lbl">donors</div></div>
+    <div class="impact-stat"><span class="num" id="statDistricts">7</span><div class="lbl">districts served</div></div>
+  </div>
+
+  <!-- RATING BARS -->
+  <div class="rating-card" id="ratingBars"></div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <h2>Share Your Experience</h2>
+    <p class="sub">Donated a meal? Received support? Volunteered with us? We'd love to hear your story — it helps build trust and inspires others to give.</p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="inputName" placeholder="e.g. Nguyễn Minh Anh">
+      </div>
+      <div class="form-group">
+        <label>Your Rating</label>
+        <div class="star-input" id="starInput">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Role</label>
+        <select id="inputRole">
+          <option value="">Select your role...</option>
+          <option value="Donor">Donor (Nhà tài trợ)</option>
+          <option value="Meal Recipient">Meal Recipient (Người nhận)</option>
+          <option value="Volunteer">Volunteer (Tình nguyện viên)</option>
+          <option value="Community Member">Community Member</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Meal Program</label>
+        <select id="inputProgram">
+          <option value="">Select program...</option>
+          <option value="Little Hearts Meals">Little Hearts Meals</option>
+          <option value="Working Hearts Meals">Working Hearts Meals</option>
+          <option value="Gentle Hearts Meals">Gentle Hearts Meals</option>
+          <option value="General Donation">General Donation</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Your Story</label>
+      <textarea id="inputFeedback" placeholder="Tell us what this experience meant to you..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Add a Photo (optional)</label>
+      <div class="photo-zone" onclick="document.getElementById('photoInput').click()">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#52A872" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        <p>Click to upload a photo of your meal moment</p>
+        <input type="file" id="photoInput" accept="image/*" multiple>
+      </div>
+      <div id="photoPreview"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-submit" onclick="submitReview()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Share My Story
+      </button>
+      <button class="btn-clear" onclick="clearMyReviews()">Clear My Added Stories</button>
+      <span class="btn-note">Your story will appear instantly below on this browser.</span>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All Stories</button>
+    <button class="filter-btn" onclick="setFilter('photos',this)">With Photos</button>
+    <select class="filter-select" id="ratingFilter" onchange="renderReviews()">
+      <option value="0">All Ratings</option>
+      <option value="5">★★★★★ 5 stars</option>
+      <option value="4">★★★★ 4 stars</option>
+      <option value="3">★★★ 3 stars</option>
+      <option value="2">★★ 2 stars</option>
+      <option value="1">★ 1 star</option>
+    </select>
+    <select class="filter-select" id="roleFilter" onchange="renderReviews()">
+      <option value="">All Roles</option>
+      <option value="Donor">Donors</option>
+      <option value="Meal Recipient">Recipients</option>
+      <option value="Volunteer">Volunteers</option>
+    </select>
+  </div>
+
+  <div id="reviewList"></div>
+</div>
+
+<!-- Toast -->
+<div id="toast">❤ Thank you for sharing your story!</div>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <span id="lightbox-close">✕</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+const SEED = [
+  { id:'s1', name:'Nguyễn Minh Anh', role:'Donor', program:'Little Hearts Meals', rating:5,
+    text:"I've always wanted to help, but I never knew where my money was going. With Meal with Heart, I can see exactly which district the food reached and who received it. That transparency is everything. I donated for the first time last month and I've already signed up for a monthly plan.",
+    photos:[], likes:47, ts: Date.now()-1*86400000 },
+  { id:'s2', name:'Trần Văn Bình', role:'Meal Recipient', program:'Working Hearts Meals', rating:5,
+    text:"Cơm ở đây ngon và đầy đủ dinh dưỡng lắm. Mỗi ngày sau ca làm mệt, được ăn một bữa ấm như vậy là tiếp thêm động lực để làm việc. Cảm ơn các bạn rất nhiều.",
+    photos:[], likes:63, ts: Date.now()-2*86400000 },
+  { id:'s3', name:'Lê Hoàng Thu', role:'Volunteer', program:'Gentle Hearts Meals', rating:5,
+    text:"Tôi tình nguyện phát cơm mỗi thứ Tư tại quận 7. Nhìn khuôn mặt các cụ vui khi nhận bữa cơm — đó là lý do tôi tiếp tục đến. Tổ chức rất chuyên nghiệp và minh bạch.",
+    photos:[], likes:38, ts: Date.now()-4*86400000 },
+  { id:'s4', name:'Phạm Quỳnh Như', role:'Donor', program:'General Donation', rating:5,
+    text:"What I love most is the real-time photo updates after each distribution. I could see the exact location and the smiling faces. It made my 100,000 VND donation feel so much more meaningful. I shared it on my Facebook and three friends joined too.",
+    photos:[], likes:55, ts: Date.now()-6*86400000 },
+  { id:'s5', name:'Bà Tư', role:'Meal Recipient', program:'Gentle Hearts Meals', rating:5,
+    text:"Tuổi già ở một mình, nhiều hôm không có sức đi chợ. Nhờ có cơm của các em, tôi ăn đủ bữa hơn, sức khoẻ cũng tốt hơn. Cầu trời cho các em mạnh khoẻ.",
+    photos:[], likes:81, ts: Date.now()-8*86400000 },
+  { id:'s6', name:'Minh Đức', role:'Donor', program:'Little Hearts Meals', rating:4,
+    text:"Great initiative. The dashboard is clear and I appreciate being able to track where donations go. Would love to see more meal options for children with dietary needs. Overall very satisfied with the transparency.",
+    photos:[], likes:22, ts: Date.now()-12*86400000 },
+  { id:'s7', name:'Chị Mai', role:'Meal Recipient', program:'Working Hearts Meals', rating:5,
+    text:"Thanks to this support, my child and I can eat better. It really eases my worries. The meal boxes are always clean, fresh, and come with a little note — that small detail shows how much care goes into each one.",
+    photos:[], likes:44, ts: Date.now()-15*86400000 },
+];
+
+const KEY = 'mwh_reviews', KEY_L = 'mwh_likes';
+function loadU() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function saveU(r) { localStorage.setItem(KEY, JSON.stringify(r)); }
+function loadL() { try { return JSON.parse(localStorage.getItem(KEY_L)) || {}; } catch { return {}; } }
+function saveL(l) { localStorage.setItem(KEY_L, JSON.stringify(l)); }
+function all() { return [...loadU(), ...SEED]; }
+
+// Star input
+let selRating = 0, photoUrls = [];
+document.querySelectorAll('#starInput span').forEach(s => {
+  s.addEventListener('mouseenter', () => hi(+s.dataset.v));
+  s.addEventListener('mouseleave', () => hi(selRating));
+  s.addEventListener('click', () => { selRating = +s.dataset.v; hi(selRating); });
+});
+function hi(n) {
+  document.querySelectorAll('#starInput span').forEach(s => s.className = +s.dataset.v <= n ? 'son' : 'soff');
+}
+
+document.getElementById('photoInput').addEventListener('change', function() {
+  photoUrls = [];
+  document.getElementById('photoPreview').innerHTML = '';
+  Array.from(this.files).slice(0,4).forEach(f => {
+    const r = new FileReader();
+    r.onload = e => {
+      photoUrls.push(e.target.result);
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.onclick = () => openLB(e.target.result);
+      document.getElementById('photoPreview').appendChild(img);
+    };
+    r.readAsDataURL(f);
+  });
+});
+
+function submitReview() {
+  const name = document.getElementById('inputName').value.trim();
+  const role = document.getElementById('inputRole').value;
+  const program = document.getElementById('inputProgram').value;
+  const text = document.getElementById('inputFeedback').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!selRating) { alert('Please select a rating.'); return; }
+  if (!text) { alert('Please share your story.'); return; }
+
+  const rev = { id:'u'+Date.now(), name, role: role||'Community Member', program: program||'Meal with Heart', rating: selRating, text, photos:[...photoUrls], likes:0, ts:Date.now(), user:true };
+  const ex = loadU(); ex.unshift(rev); saveU(ex);
+
+  document.getElementById('inputName').value = '';
+  document.getElementById('inputRole').value = '';
+  document.getElementById('inputProgram').value = '';
+  document.getElementById('inputFeedback').value = '';
+  document.getElementById('photoPreview').innerHTML = '';
+  document.getElementById('photoInput').value = '';
+  photoUrls = []; selRating = 0; hi(0);
+
+  renderAll();
+  showToast();
+  document.getElementById('reviewList').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function clearMyReviews() {
+  if (!confirm('Remove all stories you added on this browser?')) return;
+  saveU([]); renderAll();
+}
+
+function toggleLike(id) {
+  const l = loadL();
+  if (l[id]) delete l[id]; else l[id] = true;
+  saveL(l); renderAll();
+}
+
+let curFilter = 'all';
+function setFilter(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews();
+}
+
+function renderReviews() {
+  let reviews = all();
+  const rF = +document.getElementById('ratingFilter').value;
+  const roleF = document.getElementById('roleFilter').value;
+  if (curFilter === 'photos') reviews = reviews.filter(r => r.photos && r.photos.length);
+  if (rF) reviews = reviews.filter(r => r.rating === rF);
+  if (roleF) reviews = reviews.filter(r => r.role === roleF);
+
+  const likes = loadL();
+  const el = document.getElementById('reviewList');
+  if (!reviews.length) { el.innerHTML = '<div class="no-reviews">No stories match your current filter.</div>'; return; }
+
+  el.innerHTML = reviews.map(r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating);
+    const init = r.name.split(' ').map(w=>w[0]).slice(-2).join('').toUpperCase();
+    const liked = likes[r.id];
+    const lc = (r.likes||0) + (liked ? 1 : 0);
+    const photos = r.photos && r.photos.length
+      ? `<div class="review-photos">${r.photos.map(p=>`<img src="${p}" alt="" onclick="openLB('${p}')">`).join('')}</div>` : '';
+    return `<div class="review-card">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="avatar">${esc(init)}</div>
+          <div>
+            <div class="reviewer-name">${esc(r.name)}</div>
+            <div class="reviewer-meta">${esc(r.role)} · ${fmt(r.ts)}</div>
+          </div>
+        </div>
+        <button class="review-like ${liked?'liked':''}" onclick="toggleLike('${r.id}')">♥ ${lc}</button>
+      </div>
+      <div class="review-stars">${stars}</div>
+      <span class="review-program">🍱 ${esc(r.program)}</span>
+      <div class="review-text">${esc(r.text)}</div>
+      ${photos}
+    </div>`;
+  }).join('');
+}
+
+function renderBars() {
+  const reviews = all();
+  const total = reviews.length;
+  const avg = total ? (reviews.reduce((s,r)=>s+r.rating,0)/total).toFixed(1) : '0.0';
+  const filled = Math.round(+avg);
+  document.getElementById('avgScore').textContent = avg;
+  document.getElementById('avgStars').textContent = '★'.repeat(filled)+'☆'.repeat(5-filled);
+  document.getElementById('totalCount').textContent = total + ' stories';
+  document.getElementById('statDonors').textContent = reviews.filter(r=>r.role==='Donor').length + 300;
+
+  document.getElementById('ratingBars').innerHTML = [5,4,3,2,1].map(n => {
+    const c = reviews.filter(r=>r.rating===n).length;
+    const pct = total ? Math.round(c/total*100) : 0;
+    return `<div class="bar-row">
+      <span class="bar-stars">${'★'.repeat(n)+'☆'.repeat(5-n)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <span class="bar-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAll() { renderBars(); renderReviews(); }
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(ts) {
+  const d = Date.now()-ts;
+  if (d < 3600000) return Math.max(1,Math.round(d/60000))+' min ago';
+  if (d < 86400000) return Math.round(d/3600000)+' hr ago';
+  if (d < 604800000) return Math.round(d/86400000)+' days ago';
+  return new Date(ts).toLocaleDateString('vi-VN');
+}
+function showToast() {
+  const t = document.getElementById('toast'); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+function openLB(src) { document.getElementById('lightbox-img').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+renderAll();
+</script>
+</body>
+</html>
